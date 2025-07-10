@@ -14,7 +14,7 @@ FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 # Rails app lives here
 WORKDIR /rails
 
-# Install base packages
+# Install base packages and Node.js
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
     ack \
@@ -25,6 +25,8 @@ RUN apt-get update -qq && \
     postgresql-client \
     vim \
     && \
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
+    apt-get install --no-install-recommends -y nodejs && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Set production environment
@@ -36,11 +38,9 @@ ENV RAILS_ENV="production" \
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
-# Install packages needed to build gems and Node.js
+# Install packages needed to build gems
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config && \
-    curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
-    apt-get install --no-install-recommends -y nodejs && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install application gems
@@ -62,15 +62,9 @@ RUN bundle exec bootsnap precompile app/ lib/
 # Final stage for app image
 FROM base
 
-# Copy built artifacts: gems, application, Node.js
+# Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
-# Copy complete Node.js installation
-COPY --from=build /usr/bin/node* /usr/bin/
-COPY --from=build /usr/bin/npm* /usr/bin/
-COPY --from=build /usr/bin/npx* /usr/bin/
-COPY --from=build /usr/lib/node_modules /usr/lib/node_modules
-COPY --from=build /usr/share/nodejs /usr/share/nodejs
 
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \
