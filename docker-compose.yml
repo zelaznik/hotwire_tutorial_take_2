@@ -1,0 +1,20 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - ".env.${RAILS_ENV:-development}"
+      - .env.docker
+    volumes:
+      - .:/rails
+    tmpfs:
+      - /tmp/pids/
+    tty: true
+    stdin_open: true
+    command: bin/rails server -b 0.0.0.0 -p 3000
+
+volumes:
+  postgres: {}
