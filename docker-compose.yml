@@ -1,20 +1,28 @@
+x-service-common: &service-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+  env_file:
+    - ".env.${RAILS_ENV:-development}"
+    - .env.docker
+  volumes:
+    - .:/rails
+  tmpfs:
+    - /tmp/pids/
+  tty: true
+  stdin_open: true
+
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    <<: *service-common
     ports:
       - "3000:3000"
-    env_file:
-      - ".env.${RAILS_ENV:-development}"
-      - .env.docker
-    volumes:
-      - .:/rails
-    tmpfs:
-      - /tmp/pids/
-    tty: true
-    stdin_open: true
     command: bin/rails server -b 0.0.0.0 -p 3000
 
-volumes:
-  postgres: {}
+  js:
+    <<: *service-common
+    command: yarn build --watch
+
+  css:
+    <<: *service-common
+    command: yarn build:css --watch
