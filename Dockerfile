@@ -9,6 +9,8 @@
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.3.8
+ARG NODE_MODULES_PATH=/node_modules
+ARG BUNDLE_PATH=/usr/local/bundle
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 # Rails app lives here
@@ -35,10 +37,15 @@ ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
     BUNDLE_WITHOUT="development" \
-    NODE_PATH="/node_modules"
+    NODE_PATH="/node_modules" \
+    PATH="/node_modules/.bin:$PATH"
 
 # Throw-away build stage to reduce size of final image
 FROM base AS build
+
+# Re-declare ARG for build stage
+ARG NODE_MODULES_PATH=/node_modules
+ARG BUNDLE_PATH=/usr/local/bundle
 
 # Install packages needed to build gems
 RUN apt-get update -qq && \
@@ -52,10 +59,13 @@ RUN apt-get update -qq && \
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
-COPY package.json yarn.lock ./
 RUN BUNDLE_DEPLOYMENT=0 bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
+
+# Install Node.js packages to ${NODE_MODULES_PATH} (outside bind mount)
+COPY package.json yarn.lock ./
+RUN yarn install --modules-folder /node_modules
 
 # Copy application code
 COPY . .
@@ -64,14 +74,18 @@ COPY . .
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN yarn install
 RUN SECRET_KEY_BASE=dummy SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 # Final stage for app image
 FROM base
 
-# Copy built artifacts: gems, application
-COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
+# Re-declare ARG for final stage
+ARG NODE_MODULES_PATH=/node_modules
+ARG BUNDLE_PATH=/usr/local/bundle
+
+# Copy built artifacts: gems, node_modules, application
+COPY --from=build /usr/local/bundle /usr/local/bundle
+COPY --from=build /node_modules /node_modules
 COPY --from=build /rails /rails
 
 # Run and own only the runtime files as a non-root user for security
