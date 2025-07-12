@@ -46,6 +46,7 @@ gem "concurrent-ruby", '1.3.4'
 group :development, :test do
   # Start debugger with binding.b [https://github.com/ruby/debug]
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
+  gem "pry-rails"
 end
 
 group :development do
