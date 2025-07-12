@@ -13,6 +13,14 @@ x-service-common: &service-common
   stdin_open: true
 
 services:
+  redis:
+    image: redis:8.0.2-alpine
+    env_file:
+      - ".env.${RAILS_ENV:-development}"
+      - .env.docker
+    volumes:
+      - redis:/data
+
   web:
     <<: *service-common
     ports:
@@ -26,3 +34,6 @@ services:
   css:
     <<: *service-common
     command: yarn build:css --watch
+
+volumes:
+  redis: {}
