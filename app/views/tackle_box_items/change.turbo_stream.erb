@@ -1,0 +1,13 @@
+<turbo-stream action="replace" target="<%= dom_id(bait) %>">
+  <template>
+    <turbo-frame id="<%= dom_id(bait) %>">
+      <%= render partial: "baits/bait", formats: [:html], locals: { bait: bait } %>
+    </turbo-frame>
+  </template>
+</turbo-stream>
+
+<turbo-stream action="update" target="tackle_box_items_count">
+  <template>
+    <%= current_user.tackle_box_items.size %>
+  </template>
+</turbo-stream>

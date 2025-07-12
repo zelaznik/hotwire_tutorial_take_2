@@ -29,17 +29,21 @@ class TackleBoxItemsController < ApplicationController
 
     @bait.my_tackle_box_item = @item
 
-    # redirect_to baits_url
-    render @bait
+    respond_to do |format|
+      format.html { redirect_to baits_path }
+      format.turbo_stream { render "tackle_box_items/change", format: "turbo_stream", locals: { bait: @bait } }
+    end
   end
 
   def destroy
     @item = current_user.tackle_box_items.find(params[:id])
     @item.destroy
 
-    # redirect_to baits_url
     @bait = @item.bait
-    render @bait
-  end
 
+    respond_to do |format|
+      format.html { redirect_to baits_path }
+      format.turbo_stream { render "tackle_box_items/change", format: "turbo_stream", locals: { bait: @bait } }
+    end
+  end
 end
