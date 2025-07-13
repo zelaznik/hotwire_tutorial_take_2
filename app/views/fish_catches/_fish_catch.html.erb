@@ -10,7 +10,8 @@
   </div>
   <div class="actions">
     <%= link_to image_tag("pencil.svg"),
-                edit_fish_catch_path(fish_catch)%>
+                edit_fish_catch_path(fish_catch),
+                data: { turbo_frame: :_top } %>
 
     <%= button_to fish_catch_path(fish_catch), method: :delete do %>
       <%= image_tag("trash.svg") %>
