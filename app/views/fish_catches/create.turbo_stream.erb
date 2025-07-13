@@ -1,0 +1,23 @@
+<turbo-stream action="update" target="stats">
+  <template>
+    <%= render partial: "tackle_box_items/stats",
+        formats: [:html],
+        locals: { fish_catches: @fish_catches } %>
+  </template>
+</turbo-stream>
+
+<turbo-stream action="prepend" target="catches">
+  <template>
+    <%= render partial: "fish_catches/fish_catch",
+        formats: [:html],
+        locals: { fish_catch: @fish_catch } %>
+  </template>
+</turbo-stream>
+
+<turbo-stream action="update" target="new_catch">
+  <template>
+    <%= render partial: "fish_catches/form",
+        formats: [:html],
+        locals: { fish_catch: @new_catch } %>
+  </template>
+</turbo-stream>
