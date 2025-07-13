@@ -1,3 +1,7 @@
 <h2>New Fish Catch</h2>
 
-<%= render "form", fish_catch: @fish_catch %>
+<turbo-frame id="new_catch">
+  <%= render partial: "fish_catches/form",
+      formats: [:html],
+      locals: { fish_catch: @fish_catch } %>
+</turbo-frame>
