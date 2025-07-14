@@ -1,3 +1,7 @@
 <h2>Edit Fish Catch</h2>
 
-<%= render "form", fish_catch: @fish_catch %>
+<turbo-frame id="<%= dom_id(@fish_catch) %>">
+  <div class="edit" style="display: block">
+    <%= render "form", fish_catch: @fish_catch %>
+  </div>
+</turbo-frame>

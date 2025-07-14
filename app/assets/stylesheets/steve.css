@@ -1,0 +1,5 @@
+#tackle_box_items_show#tackle_box_items_show {
+  & :has(.edit) {
+    display: block;
+  }
+}

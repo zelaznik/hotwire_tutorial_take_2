@@ -15,6 +15,10 @@ class FishCatchesController < ApplicationController
   end
 
   def edit
+    respond_to do |format|
+      format.html { render :edit }
+      format.turbo_stream { render :edit }
+    end
   end
 
   def update
@@ -26,7 +30,7 @@ class FishCatchesController < ApplicationController
   end
 
   def create
-    @fish_catch = fish_catch = current_user.fish_catches.new(fish_catch_params)
+    @fish_catch = current_user.fish_catches.new(fish_catch_params)
 
     if @fish_catch.save
       respond_to do |format|
