@@ -1,5 +1,11 @@
 <div class="filter">
-  <%= form_with(url: fish_catches_path, method: :get) do |f| %>
+  <%= form_with(url: fish_catches_path, method: :get,
+      data: {
+        turbo_frame: "catches",
+        turbo_action: "replace",
+        controller: "form",
+        action: "input->form#submit",
+      }) do |f| %>
     <div class="row-1">
       <div>
         <%= f.select :bait, @bait_names,
@@ -26,50 +32,52 @@
   <% end %>
 </div>
 
-<% if @fish_catches.any? %>
-  <div class="fish-catches">
-    <table>
-      <thead>
-        <tr>
-          <th class="bait">
-            <%= sort_link_to "Bait", "bait" %>
-          </th>
-          <th class="species">
-            <%= sort_link_to "Species", "species" %>
-          </th>
-          <th class="weight">
-            <%= sort_link_to "Weight", "weight" %>
-          </th>
-          <th class="length">
-            <%= sort_link_to "Length", "length" %>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @fish_catches.each do |fish_catch| %>
+<turbo-frame id="catches">
+  <% if @fish_catches.any? %>
+    <div class="fish-catches">
+      <table>
+        <thead>
           <tr>
-            <td class="bait">
-              <%= fish_catch.bait.name %>
-            </td>
-            <td class="species">
-              <%= fish_catch.species %>
-            </td>
-            <td class="weight">
-              <%= fish_catch.weight %> lbs
-            </td>
-            <td class="length">
-              <%= fish_catch.length %> in
-            </td>
+            <th class="bait">
+              <%= sort_link_to "Bait", "bait" %>
+            </th>
+            <th class="species">
+              <%= sort_link_to "Species", "species" %>
+            </th>
+            <th class="weight">
+              <%= sort_link_to "Weight", "weight" %>
+            </th>
+            <th class="length">
+              <%= sort_link_to "Length", "length" %>
+            </th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
-    <% if @pagy.pages > 1 %>
-      <div class="footer">
-        <%== pagy_nav(@pagy) %>
-      </div>
-    <% end %>
-  </div>
-<% else %>
-  <%= render "no_catches" %>
-<% end %>
+        </thead>
+        <tbody>
+          <% @fish_catches.each do |fish_catch| %>
+            <tr>
+              <td class="bait">
+                <%= fish_catch.bait.name %>
+              </td>
+              <td class="species">
+                <%= fish_catch.species %>
+              </td>
+              <td class="weight">
+                <%= fish_catch.weight %> lbs
+              </td>
+              <td class="length">
+                <%= fish_catch.length %> in
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <% if @pagy.pages > 1 %>
+        <div class="footer">
+          <%== pagy_nav(@pagy) %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render "no_catches" %>
+  <% end %>
+</turbo-frame>
