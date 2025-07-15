@@ -11,3 +11,9 @@
     <%= current_user.tackle_box_items.size %>
   </template>
 </turbo-stream>
+
+<turbo-stream action="update" target="flash">
+  <template>
+    <%= render partial: "layouts/flash", formats: [:html] %>
+  </template>
+</turbo-stream>

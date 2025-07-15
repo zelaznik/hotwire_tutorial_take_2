@@ -23,7 +23,15 @@ class FishCatchesController < ApplicationController
 
   def update
     if @fish_catch.update(fish_catch_params)
-      redirect_to tackle_box_item_for_catch(@fish_catch)
+      dual_flash(:notice, "Catch successfully updated")
+
+      respond_to do |format|
+        format.turbo_stream do
+          @fish_catches = fish_catches_for_bait(@fish_catch.bait)
+          render :update
+        end
+        format.html { redirect_to tackle_box_item_for_catch(@fish_catch) }
+      end
     else
       render :edit, status: :unprocessable_entity
     end
@@ -33,6 +41,8 @@ class FishCatchesController < ApplicationController
     @fish_catch = current_user.fish_catches.new(fish_catch_params)
 
     if @fish_catch.save
+      dual_flash(:notice, "Catch successfully created.")
+
       respond_to do |format|
         format.turbo_stream do
           @fish_catches = fish_catches_for_bait(@fish_catch.bait)
@@ -51,16 +61,27 @@ class FishCatchesController < ApplicationController
   def destroy
     @fish_catch.destroy
 
+    dual_flash(:notice, "Catch successfully deleted.")
+
     respond_to do |format|
       format.turbo_stream do
         @fish_catches = fish_catches_for_bait(@fish_catch.bait)
         render :destroy
       end
-      format.html { redirect_to tackle_box_item_for_catch(@fish_catch) }
+
+      format.html do
+        redirect_to tackle_box_item_for_catch(@fish_catch)
+      end
     end
   end
 
 private
+  def dual_flash(key, message)
+    respond_to do |format|
+      format.turbo_stream { flash.now[key] = message }
+      format.html { flash[key] = message }
+    end
+  end
 
   def set_fish_catch
     @fish_catch = current_user.fish_catches.find(params[:id])

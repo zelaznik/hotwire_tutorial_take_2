@@ -8,3 +8,9 @@
 
 <turbo-stream action="remove" target="<%= dom_id(@fish_catch) %>">
 </turbo-stream>
+
+<turbo-stream action="update" target="flash">
+  <template>
+    <%= render partial: "layouts/flash", formats: [:html] %>
+  </template>
+</turbo-stream>

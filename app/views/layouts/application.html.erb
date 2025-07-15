@@ -16,7 +16,9 @@
   <body>
     <%= render "layouts/header" %>
 
-    <%= render "layouts/flash" %>
+    <div id="flash">
+      <%= render "layouts/flash" %>
+    </div>
 
     <main>
       <div id="<%= content_id %>">
