@@ -19,9 +19,11 @@
             [["By Name", "name"], ["By Popularity", "tackle_box_items_count"]],
             include_blank: "Sort By", selected: params[:sort] %>
     </div>
-    <div>
-      <%= f.submit "Search" %>
-    </div>
+    <noscript>
+      <div>
+        <%= f.submit "Search" %>
+      </div>
+    </noscript>
   <% end %>
 </div>
 
